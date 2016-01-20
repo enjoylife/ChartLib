@@ -1,0 +1,49 @@
+.chart-lib {
+    .bar {
+        fill: grey;
+    }
+
+    .bar:hover {
+        fill: #B196D4;
+    }
+
+
+    .axis {
+        font: 12px sans-serif;
+        font-weight: 600;
+        shape-rendering: crispEdges;
+
+        path,
+        line {
+            fill: none;
+            stroke: #000;
+        }
+    }
+}
+
+
+.chart-lib.minimal {
+
+  .x.axis path,
+  .x.axis .tick line {
+      display: none;
+  }
+
+
+  .y.axis .tick line {
+      display: none;
+  }
+}
+
+
+div.ca-gov-chart-tooltip {
+    position: absolute;
+    text-align: center;
+    width: 60px;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: white;
+    border: darken(white, 15%) solid 3px;
+    border-radius: 3px;
+    pointer-events: none;
+}
