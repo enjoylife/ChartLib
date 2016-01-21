@@ -1,7 +1,10 @@
 import d3 from 'd3';
 import legend from 'd3-svg-legend/no-extend';
 
-import {MAXWIDTH, MAXHEIGHT, MINWIDTH, MINHEIGHT, margin} from './constants.js';
+import {
+  MAXWIDTH, MAXHEIGHT, MINWIDTH, MINHEIGHT,
+  margin, sortDirection
+} from './constants.js';
 
 import "./charts.less";
 
@@ -25,7 +28,9 @@ $('.chart-lib').each(function()  {
 
       createAxes(chart, axes, config, dimensions.height);
       createChart(chart, tooltip, rows, scales, dimensions.height);
-
+      window.setTimeout(function() {
+        barChartSortAnimation(chart, axes, rows, scales, sortDirection.descending);
+      },2000)
   });
 
 });
@@ -44,7 +49,6 @@ $('.chart-lib').each(function()  {
 function getAndParseChartData(url, cb) {
     d3.csv(url, function (rows) {
         rows.columns = inferColumns(rows);
-        console.log(rows,rows.columns);
 
         if(cb) cb(rows);
     });
@@ -96,29 +100,44 @@ function applyStyle(el, config) {
 
 function createChart(chart,tooltip, rows, scales, height) {
 
-
-
-     chart.selectAll(".bar")
+  var bars = chart.selectAll(".bar")
       .data(rows)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", d => {return scales.x(d[scales.xProp]);  })
-      .attr("width", scales.x.rangeBand())
-      .attr("y", d => { return scales.y(d[scales.yProp]);  })
-      .attr("height", d=> { return height -scales.y(d[scales.yProp]) })
-    .on("mouseover", function(d) {
-        tooltip.transition()
-            .duration(200)
-            .style("opacity", .9);
-        tooltip	.html(scales.xProp + ": " + d[scales.xProp] + "<br/>" + scales.yProp + ": "  + d[scales.yProp])
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
-    })
-    .on("mouseout", function(d) {
-        tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-    });
+    .enter().append("rect");
+
+    // Bar minimum
+    bars.attr("class", "bar")
+    .attr("x", d => {return scales.x(d[scales.xProp]);  })
+    .attr("width", scales.x.rangeBand())
+    .attr("y", d => { return scales.y(d[scales.yProp]);  })
+    .attr("height", d=> { return height -scales.y(d[scales.yProp]) })
+
+
+  // Hover actions
+  .on("mouseover", function(d) {
+      tooltip.transition()
+          .duration(200)
+          .style("opacity", .9);
+      tooltip	.html(scales.xProp + ": " + d[scales.xProp] + "<br/>" + scales.yProp + ": "  + d[scales.yProp])
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+  })
+  .on("mouseout", function(d) {
+      tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+  });
+
+  // TODO: utilize transform
+  // like http://bl.ocks.org/mbostock/1584697
+
+  // Append Y values to bar tips
+  // bars.append("text")
+  //   .attr("text-anchor", "middle")
+  //   .attr("x", function(d) { return scales.x(d[scales.xProp]) + scales.x.rangeBand() / 2; })
+  //   .attr("y", function(d) {return scales.y(d[scales.yProp]) - 6 } )
+  //   .attr("dy", ".35em")
+  //   .text(function(d, i) { return i; });
+
 }
 
 // Assuming the config was set on the window object
@@ -167,6 +186,44 @@ function computeOptimalSize(el) {
 }
 
 
+
+
+function barChartSortAnimation(chart, axes, data, scales, direction) {
+
+
+    var cmpFunc;
+    if(direction == sortDirection.ascending){
+      cmpFunc = function (a, b) {
+          return a[scales.yProp] - b[scales.yProp]
+      }
+    } else {
+      cmpFunc = function (a, b) {
+        return  b[scales.yProp] - a[scales.yProp]
+      }
+    }
+
+  // Copy-on-write since tweens are evaluated after a delay.
+  var x0 = scales.x.domain(data.sort(cmpFunc)
+      .map(function(d) { return d[scales.xProp]; }))
+      .copy();
+
+  chart.selectAll(".bar")
+        .sort(function(a, b) { return x0(a[scales.xProp]) - x0(b[scales.xProp]); });
+
+var transition = chart.transition().duration(750),
+        delay = function(d, i) { return i * 50; };
+
+    transition.selectAll(".bar")
+        .delay(delay)
+        .attr("x", function(d) { return x0(d[scales.xProp]); });
+
+    transition.select(".x.axis")
+        .call(axes.x)
+      .selectAll("g")
+        .delay(delay);
+
+}
+
 /**
  * CODE WHICH HAS NO DEPENDENCY ON DOM, JUST PURE JS
  */
@@ -207,6 +264,7 @@ function inferSimpleAxes(config, scales) {
 
   return {x : xAxis, y:  yAxis}
 }
+
 
 function customAxis() {
 

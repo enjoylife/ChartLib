@@ -10,3 +10,11 @@ export const MINWIDTH = 300;
 export const MINHEIGHT = 300;
 
 export const margin = { top: TOPMARGIN, right: RIGHTMARGIN, bottom: BOTTOMMARGIN, left: LEFTMARGIN};
+
+
+const DESC = 'desc';
+const ASC = 'asc';
+
+export const sortDirection = {
+  ascending : ASC, descending: DESC
+};
