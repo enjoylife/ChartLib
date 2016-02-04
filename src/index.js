@@ -1,6 +1,7 @@
 import d3 from 'd3';
 import legend from 'd3-svg-legend/no-extend';
 
+
 import {
   MAXWIDTH, MAXHEIGHT, MINWIDTH, MINHEIGHT,
   margin, sortDirection
@@ -102,14 +103,19 @@ function createChart(chart,tooltip, rows, scales, height) {
 
   var bars = chart.selectAll(".bar")
       .data(rows)
-    .enter().append("rect");
+    .enter().append("g")
+      .attr("class", "bar")
+      .attr("transform", function(d, i) {
+          return "translate(" + scales.x(d[scales.xProp]) +"," + 0 + ")"; });
+    // .enter().append("rect");
 
     // Bar minimum
-    bars.attr("class", "bar")
-    .attr("x", d => {return scales.x(d[scales.xProp]);  })
+    bars.append("rect")
+    .attr("x", d => {return 0  })
     .attr("width", scales.x.rangeBand())
     .attr("y", d => { return scales.y(d[scales.yProp]);  })
-    .attr("height", d=> { return height -scales.y(d[scales.yProp]) })
+    .attr("height", d=> { return height - scales.y(d[scales.yProp]) })
+
 
 
   // Hover actions
@@ -131,12 +137,12 @@ function createChart(chart,tooltip, rows, scales, height) {
   // like http://bl.ocks.org/mbostock/1584697
 
   // Append Y values to bar tips
-  // bars.append("text")
-  //   .attr("text-anchor", "middle")
-  //   .attr("x", function(d) { return scales.x(d[scales.xProp]) + scales.x.rangeBand() / 2; })
-  //   .attr("y", function(d) {return scales.y(d[scales.yProp]) - 6 } )
-  //   .attr("dy", ".35em")
-  //   .text(function(d, i) { return i; });
+  bars.append("text")
+    .attr("text-anchor", "middle")
+    .attr("x", scales.x.rangeBand() / 2 )
+    .attr("y", function(d) {return scales.y(d[scales.yProp]) + 12; } )
+    .attr("dy", ".35em")
+    .text(function(d, i) { return i; });
 
 }
 
@@ -215,7 +221,8 @@ var transition = chart.transition().duration(750),
 
     transition.selectAll(".bar")
         .delay(delay)
-        .attr("x", function(d) { return x0(d[scales.xProp]); });
+        .attr("transform", function(d, i) {
+            return "translate(" + scales.x(d[scales.xProp]) +"," + 0 + ")"; });
 
     transition.select(".x.axis")
         .call(axes.x)

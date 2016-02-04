@@ -1,0 +1,673 @@
+<!-- saved from url=(0055)http://neuralengr.com/asifr/journals/journals_tdcs.html -->
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <script src="./test_files/jquery.min.js"></script>
+    <script src="./test_files/scripts.js"></script>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #b6b6b6;
+            shape-rendering: crispEdges;
+        }
+        /*.tick line{fill:none;stroke:none;}*/
+
+        .tick text {
+            fill: #999;
+        }
+
+        g.journal.active {
+            cursor: pointer;
+        }
+
+        text.label {
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        text.value {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+    <style id="style-1-cropbar-clipper">
+        /* Copyright 2014 Evernote Corporation. All rights reserved. */
+
+        .en-markup-crop-options {
+            top: 18px !important;
+            left: 50% !important;
+            margin-left: -100px !important;
+            width: 200px !important;
+            border: 2px rgba(255, 255, 255, .38) solid !important;
+            border-radius: 4px !important;
+        }
+
+        .en-markup-crop-options div div:first-of-type {
+            margin-left: 0px !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script type="text/javascript">
+        function truncate(str, maxLength, suffix) {
+            if (str.length > maxLength) {
+                str = str.substring(0, maxLength + 1);
+                str = str.substring(0, Math.min(str.length, str.lastIndexOf(" ")));
+                str = str + suffix;
+            }
+            return str;
+        }
+
+        var margin = {
+                top: 20,
+                right: 200,
+                bottom: 0,
+                left: 20
+            },
+            width = 450,
+            height = 650;
+
+        var start_year = 1999,
+            end_year = 2013;
+
+        var c = d3.scale.category20c();
+
+        var x = d3.scale.linear()
+            .range([0, width]);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("top");
+
+        var formatYears = d3.format("0000");
+        xAxis.tickFormat(formatYears);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .style("margin-left", margin.left + "px")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.json("journals_tdcs.json", function(data) {
+            x.domain([start_year, end_year]);
+            var xScale = d3.scale.linear()
+                .domain([start_year, end_year])
+                .range([0, width]);
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + 0 + ")")
+                .call(xAxis);
+
+            for (var j = 0; j < data.length; j++) {
+                var g = svg.append("g").attr("class", "journal");
+
+                var circles = g.selectAll("circle")
+                    .data(data[j]['articles'])
+                    .enter()
+                    .append("circle");
+
+                var text = g.selectAll("text")
+                    .data(data[j]['articles'])
+                    .enter()
+                    .append("text");
+
+                var rScale = d3.scale.linear()
+                    .domain([0, d3.max(data[j]['articles'], function(d) {
+                        return d[1];
+                    })])
+                    .range([2, 9]);
+
+                circles
+                    .attr("cx", function(d, i) {
+                        return xScale(d[0]);
+                    })
+                    .attr("cy", j * 20 + 20)
+                    .attr("r", function(d) {
+                        return rScale(d[1]);
+                    })
+                    .style("fill", function(d) {
+                        return c(j);
+                    });
+
+                text
+                    .attr("y", j * 20 + 25)
+                    .attr("x", function(d, i) {
+                        return xScale(d[0]) - 5;
+                    })
+                    .attr("class", "value")
+                    .text(function(d) {
+                        return d[1];
+                    })
+                    .style("fill", function(d) {
+                        return c(j);
+                    })
+                    .style("display", "none");
+
+                g.append("text")
+                    .attr("y", j * 20 + 25)
+                    .attr("x", width + 20)
+                    .attr("class", "label")
+                    .text(truncate(data[j]['name'], 30, "..."))
+                    .style("fill", function(d) {
+                        return c(j);
+                    })
+                    .on("mouseover", mouseover)
+                    .on("mouseout", mouseout);
+            };
+
+            function mouseover(p) {
+                var g = d3.select(this).node().parentNode;
+                d3.select(g).selectAll("circle").style("display", "none");
+                d3.select(g).selectAll("text.value").style("display", "block");
+            }
+
+            function mouseout(p) {
+                var g = d3.select(this).node().parentNode;
+                d3.select(g).selectAll("circle").style("display", "block");
+                d3.select(g).selectAll("text.value").style("display", "none");
+            }
+        });
+    </script>
+    <svg width="670" height="670" style="margin-left: 20px;">
+        <g transform="translate(20,20)">
+            <g class="x axis" transform="translate(0,0)">
+                <g class="tick major" transform="translate(32.14285714285714,0)" style="opacity: 1;">
+                    <line y2="-6" x2="0"></line>
+                    <text y="-9" x="0" dy="0em" style="text-anchor: middle;">2000</text>
+                </g>
+                <g class="tick major" transform="translate(96.42857142857142,0)" style="opacity: 1;">
+                    <line y2="-6" x2="0"></line>
+                    <text y="-9" x="0" dy="0em" style="text-anchor: middle;">2002</text>
+                </g>
+                <g class="tick major" transform="translate(160.7142857142857,0)" style="opacity: 1;">
+                    <line y2="-6" x2="0"></line>
+                    <text y="-9" x="0" dy="0em" style="text-anchor: middle;">2004</text>
+                </g>
+                <g class="tick major" transform="translate(225,0)" style="opacity: 1;">
+                    <line y2="-6" x2="0"></line>
+                    <text y="-9" x="0" dy="0em" style="text-anchor: middle;">2006</text>
+                </g>
+                <g class="tick major" transform="translate(289.2857142857143,0)" style="opacity: 1;">
+                    <line y2="-6" x2="0"></line>
+                    <text y="-9" x="0" dy="0em" style="text-anchor: middle;">2008</text>
+                </g>
+                <g class="tick major" transform="translate(353.57142857142856,0)" style="opacity: 1;">
+                    <line y2="-6" x2="0"></line>
+                    <text y="-9" x="0" dy="0em" style="text-anchor: middle;">2010</text>
+                </g>
+                <g class="tick major" transform="translate(417.85714285714283,0)" style="opacity: 1;">
+                    <line y2="-6" x2="0"></line>
+                    <text y="-9" x="0" dy="0em" style="text-anchor: middle;">2012</text>
+                </g>
+                <path class="domain" d="M0,-6V0H450V-6"></path>
+            </g>
+            <g class="journal">
+                <circle cx="289.2857142857143" cy="20" r="4.1" style="fill: rgb(49, 130, 189);"></circle>
+                <circle cx="321.4285714285714" cy="20" r="3.4000000000000004" style="fill: rgb(49, 130, 189);"></circle>
+                <circle cx="353.57142857142856" cy="20" r="2.7" style="fill: rgb(49, 130, 189);"></circle>
+                <circle cx="385.71428571428567" cy="20" r="4.1" style="fill: rgb(49, 130, 189);"></circle>
+                <circle cx="417.85714285714283" cy="20" r="6.8999999999999995" style="fill: rgb(49, 130, 189);"></circle>
+                <circle cx="450" cy="20" r="9" style="fill: rgb(49, 130, 189);"></circle>
+                <text y="25" x="284.2857142857143" class="value" style="fill: rgb(49, 130, 189); display: none;">9</text>
+                <text y="25" x="316.4285714285714" class="value" style="fill: rgb(49, 130, 189); display: none;">6</text>
+                <text y="25" x="348.57142857142856" class="value" style="fill: rgb(49, 130, 189); display: none;">3</text>
+                <text y="25" x="380.71428571428567" class="value" style="fill: rgb(49, 130, 189); display: none;">9</text>
+                <text y="25" x="412.85714285714283" class="value" style="fill: rgb(49, 130, 189); display: none;">21</text>
+                <text y="25" x="445" class="value" style="fill: rgb(49, 130, 189); display: none;">30</text>
+                <text y="25" x="470" class="label" style="fill: rgb(49, 130, 189);">Brain stimulation</text>
+            </g>
+            <g class="journal">
+                <circle cx="-96.42857142857142" cy="40" r="2.7" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="32.14285714285714" cy="40" r="2.7" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="225" cy="40" r="3.4000000000000004" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="289.2857142857143" cy="40" r="4.800000000000001" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="321.4285714285714" cy="40" r="3.4000000000000004" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="353.57142857142856" cy="40" r="2.7" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="385.71428571428567" cy="40" r="5.5" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="417.85714285714283" cy="40" r="9" style="fill: rgb(107, 174, 214);"></circle>
+                <circle cx="450" cy="40" r="7.6000000000000005" style="fill: rgb(107, 174, 214);"></circle>
+                <text y="45" x="-101.42857142857142" class="value" style="fill: rgb(107, 174, 214); display: none;">1</text>
+                <text y="45" x="27.14285714285714" class="value" style="fill: rgb(107, 174, 214); display: none;">1</text>
+                <text y="45" x="220" class="value" style="fill: rgb(107, 174, 214); display: none;">2</text>
+                <text y="45" x="284.2857142857143" class="value" style="fill: rgb(107, 174, 214); display: none;">4</text>
+                <text y="45" x="316.4285714285714" class="value" style="fill: rgb(107, 174, 214); display: none;">2</text>
+                <text y="45" x="348.57142857142856" class="value" style="fill: rgb(107, 174, 214); display: none;">1</text>
+                <text y="45" x="380.71428571428567" class="value" style="fill: rgb(107, 174, 214); display: none;">5</text>
+                <text y="45" x="412.85714285714283" class="value" style="fill: rgb(107, 174, 214); display: none;">10</text>
+                <text y="45" x="445" class="value" style="fill: rgb(107, 174, 214); display: none;">8</text>
+                <text y="45" x="470" class="label" style="fill: rgb(107, 174, 214);">Neuroscience letters</text>
+            </g>
+            <g class="journal">
+                <circle cx="64.28571428571428" cy="60" r="3.4000000000000004" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="128.57142857142856" cy="60" r="6.200000000000001" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="160.7142857142857" cy="60" r="6.200000000000001" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="225" cy="60" r="6.200000000000001" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="257.1428571428571" cy="60" r="3.4000000000000004" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="289.2857142857143" cy="60" r="4.800000000000001" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="321.4285714285714" cy="60" r="7.6000000000000005" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="353.57142857142856" cy="60" r="7.6000000000000005" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="385.71428571428567" cy="60" r="7.6000000000000005" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="417.85714285714283" cy="60" r="9" style="fill: rgb(158, 202, 225);"></circle>
+                <circle cx="450" cy="60" r="7.6000000000000005" style="fill: rgb(158, 202, 225);"></circle>
+                <text y="65" x="59.28571428571428" class="value" style="fill: rgb(158, 202, 225); display: none;">1</text>
+                <text y="65" x="123.57142857142856" class="value" style="fill: rgb(158, 202, 225); display: none;">3</text>
+                <text y="65" x="155.7142857142857" class="value" style="fill: rgb(158, 202, 225); display: none;">3</text>
+                <text y="65" x="220" class="value" style="fill: rgb(158, 202, 225); display: none;">3</text>
+                <text y="65" x="252.1428571428571" class="value" style="fill: rgb(158, 202, 225); display: none;">1</text>
+                <text y="65" x="284.2857142857143" class="value" style="fill: rgb(158, 202, 225); display: none;">2</text>
+                <text y="65" x="316.4285714285714" class="value" style="fill: rgb(158, 202, 225); display: none;">4</text>
+                <text y="65" x="348.57142857142856" class="value" style="fill: rgb(158, 202, 225); display: none;">4</text>
+                <text y="65" x="380.71428571428567" class="value" style="fill: rgb(158, 202, 225); display: none;">4</text>
+                <text y="65" x="412.85714285714283" class="value" style="fill: rgb(158, 202, 225); display: none;">5</text>
+                <text y="65" x="445" class="value" style="fill: rgb(158, 202, 225); display: none;">4</text>
+                <text y="65" x="470" class="label" style="fill: rgb(158, 202, 225);">Clinical neurophysiology :...</text>
+            </g>
+            <g class="journal">
+                <circle cx="128.57142857142856" cy="80" r="4.333333333333333" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="160.7142857142857" cy="80" r="5.5" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="192.85714285714283" cy="80" r="3.1666666666666665" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="257.1428571428571" cy="80" r="4.333333333333333" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="289.2857142857143" cy="80" r="4.333333333333333" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="321.4285714285714" cy="80" r="4.333333333333333" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="353.57142857142856" cy="80" r="4.333333333333333" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="385.71428571428567" cy="80" r="6.666666666666666" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="417.85714285714283" cy="80" r="7.833333333333333" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="450" cy="80" r="9" style="fill: rgb(198, 219, 239);"></circle>
+                <text y="85" x="123.57142857142856" class="value" style="fill: rgb(198, 219, 239); display: none;">2</text>
+                <text y="85" x="155.7142857142857" class="value" style="fill: rgb(198, 219, 239); display: none;">3</text>
+                <text y="85" x="187.85714285714283" class="value" style="fill: rgb(198, 219, 239); display: none;">1</text>
+                <text y="85" x="252.1428571428571" class="value" style="fill: rgb(198, 219, 239); display: none;">2</text>
+                <text y="85" x="284.2857142857143" class="value" style="fill: rgb(198, 219, 239); display: none;">2</text>
+                <text y="85" x="316.4285714285714" class="value" style="fill: rgb(198, 219, 239); display: none;">2</text>
+                <text y="85" x="348.57142857142856" class="value" style="fill: rgb(198, 219, 239); display: none;">2</text>
+                <text y="85" x="380.71428571428567" class="value" style="fill: rgb(198, 219, 239); display: none;">4</text>
+                <text y="85" x="412.85714285714283" class="value" style="fill: rgb(198, 219, 239); display: none;">5</text>
+                <text y="85" x="445" class="value" style="fill: rgb(198, 219, 239); display: none;">6</text>
+                <text y="85" x="470" class="label" style="fill: rgb(198, 219, 239);">Experimental brain research....</text>
+            </g>
+            <g class="journal">
+                <circle cx="160.7142857142857" cy="100" r="4.333333333333333" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <circle cx="257.1428571428571" cy="100" r="6.666666666666666" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <circle cx="289.2857142857143" cy="100" r="3.1666666666666665" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <circle cx="321.4285714285714" cy="100" r="9" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <circle cx="353.57142857142856" cy="100" r="3.1666666666666665" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <circle cx="385.71428571428567" cy="100" r="6.666666666666666" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="100" r="6.666666666666666" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <circle cx="450" cy="100" r="7.833333333333333" style="fill: rgb(230, 85, 13); display: block;"></circle>
+                <text y="105" x="155.7142857142857" class="value" style="fill: rgb(230, 85, 13); display: none;">2</text>
+                <text y="105" x="252.1428571428571" class="value" style="fill: rgb(230, 85, 13); display: none;">4</text>
+                <text y="105" x="284.2857142857143" class="value" style="fill: rgb(230, 85, 13); display: none;">1</text>
+                <text y="105" x="316.4285714285714" class="value" style="fill: rgb(230, 85, 13); display: none;">6</text>
+                <text y="105" x="348.57142857142856" class="value" style="fill: rgb(230, 85, 13); display: none;">1</text>
+                <text y="105" x="380.71428571428567" class="value" style="fill: rgb(230, 85, 13); display: none;">4</text>
+                <text y="105" x="412.85714285714283" class="value" style="fill: rgb(230, 85, 13); display: none;">4</text>
+                <text y="105" x="445" class="value" style="fill: rgb(230, 85, 13); display: none;">5</text>
+                <text y="105" x="470" class="label" style="fill: rgb(230, 85, 13);">The Journal of neuroscience :...</text>
+            </g>
+            <g class="journal">
+                <circle cx="353.57142857142856" cy="120" r="4.1000000000000005" style="fill: rgb(253, 141, 60);"></circle>
+                <circle cx="385.71428571428567" cy="120" r="6.200000000000001" style="fill: rgb(253, 141, 60);"></circle>
+                <circle cx="417.85714285714283" cy="120" r="6.200000000000001" style="fill: rgb(253, 141, 60);"></circle>
+                <circle cx="450" cy="120" r="9" style="fill: rgb(253, 141, 60);"></circle>
+                <circle cx="257.1428571428571" cy="120" r="2.7" style="fill: rgb(253, 141, 60);"></circle>
+                <text y="125" x="348.57142857142856" class="value" style="fill: rgb(253, 141, 60); display: none;">3</text>
+                <text y="125" x="380.71428571428567" class="value" style="fill: rgb(253, 141, 60); display: none;">6</text>
+                <text y="125" x="412.85714285714283" class="value" style="fill: rgb(253, 141, 60); display: none;">6</text>
+                <text y="125" x="445" class="value" style="fill: rgb(253, 141, 60); display: none;">10</text>
+                <text y="125" x="252.1428571428571" class="value" style="fill: rgb(253, 141, 60); display: none;">1</text>
+                <text y="125" x="470" class="label" style="fill: rgb(253, 141, 60);">NeuroImage</text>
+            </g>
+            <g class="journal">
+                <circle cx="385.71428571428567" cy="140" r="2.3043478260869565" style="fill: rgb(253, 174, 107); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="140" r="9" style="fill: rgb(253, 174, 107); display: block;"></circle>
+                <circle cx="450" cy="140" r="2.3043478260869565" style="fill: rgb(253, 174, 107); display: block;"></circle>
+                <text y="145" x="380.71428571428567" class="value" style="fill: rgb(253, 174, 107); display: none;">1</text>
+                <text y="145" x="412.85714285714283" class="value" style="fill: rgb(253, 174, 107); display: none;">23</text>
+                <text y="145" x="445" class="value" style="fill: rgb(253, 174, 107); display: none;">1</text>
+                <text y="145" x="470" class="label" style="fill: rgb(253, 174, 107);">Frontiers in psychiatry /...</text>
+            </g>
+            <g class="journal">
+                <circle cx="64.28571428571428" cy="160" r="2.875" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <circle cx="225" cy="160" r="2.875" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <circle cx="257.1428571428571" cy="160" r="2.875" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <circle cx="321.4285714285714" cy="160" r="3.75" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <circle cx="353.57142857142856" cy="160" r="4.625" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <circle cx="385.71428571428567" cy="160" r="7.25" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="160" r="9" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <circle cx="450" cy="160" r="2.875" style="fill: rgb(253, 208, 162); display: block;"></circle>
+                <text y="165" x="59.28571428571428" class="value" style="fill: rgb(253, 208, 162); display: none;">1</text>
+                <text y="165" x="220" class="value" style="fill: rgb(253, 208, 162); display: none;">1</text>
+                <text y="165" x="252.1428571428571" class="value" style="fill: rgb(253, 208, 162); display: none;">1</text>
+                <text y="165" x="316.4285714285714" class="value" style="fill: rgb(253, 208, 162); display: none;">2</text>
+                <text y="165" x="348.57142857142856" class="value" style="fill: rgb(253, 208, 162); display: none;">3</text>
+                <text y="165" x="380.71428571428567" class="value" style="fill: rgb(253, 208, 162); display: none;">6</text>
+                <text y="165" x="412.85714285714283" class="value" style="fill: rgb(253, 208, 162); display: none;">8</text>
+                <text y="165" x="445" class="value" style="fill: rgb(253, 208, 162); display: none;">1</text>
+                <text y="165" x="470" class="label" style="fill: rgb(253, 208, 162);">Journal of neurophysiology</text>
+            </g>
+            <g class="journal">
+                <circle cx="321.4285714285714" cy="180" r="3" style="fill: rgb(49, 163, 84);"></circle>
+                <circle cx="353.57142857142856" cy="180" r="5" style="fill: rgb(49, 163, 84);"></circle>
+                <circle cx="385.71428571428567" cy="180" r="8" style="fill: rgb(49, 163, 84);"></circle>
+                <circle cx="417.85714285714283" cy="180" r="9" style="fill: rgb(49, 163, 84);"></circle>
+                <circle cx="450" cy="180" r="6" style="fill: rgb(49, 163, 84);"></circle>
+                <text y="185" x="316.4285714285714" class="value" style="fill: rgb(49, 163, 84); display: none;">1</text>
+                <text y="185" x="348.57142857142856" class="value" style="fill: rgb(49, 163, 84); display: none;">3</text>
+                <text y="185" x="380.71428571428567" class="value" style="fill: rgb(49, 163, 84); display: none;">6</text>
+                <text y="185" x="412.85714285714283" class="value" style="fill: rgb(49, 163, 84); display: none;">7</text>
+                <text y="185" x="445" class="value" style="fill: rgb(49, 163, 84); display: none;">4</text>
+                <text y="185" x="470" class="label" style="fill: rgb(49, 163, 84);">PloS one</text>
+            </g>
+            <g class="journal">
+                <circle cx="160.7142857142857" cy="200" r="5.5" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="192.85714285714283" cy="200" r="3.75" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="225" cy="200" r="3.75" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="257.1428571428571" cy="200" r="7.25" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="289.2857142857143" cy="200" r="5.5" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="321.4285714285714" cy="200" r="3.75" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="353.57142857142856" cy="200" r="7.25" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="385.71428571428567" cy="200" r="3.75" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="200" r="9" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <circle cx="450" cy="200" r="5.5" style="fill: rgb(116, 196, 118); display: block;"></circle>
+                <text y="205" x="155.7142857142857" class="value" style="fill: rgb(116, 196, 118); display: none;">2</text>
+                <text y="205" x="187.85714285714283" class="value" style="fill: rgb(116, 196, 118); display: none;">1</text>
+                <text y="205" x="220" class="value" style="fill: rgb(116, 196, 118); display: none;">1</text>
+                <text y="205" x="252.1428571428571" class="value" style="fill: rgb(116, 196, 118); display: none;">3</text>
+                <text y="205" x="284.2857142857143" class="value" style="fill: rgb(116, 196, 118); display: none;">2</text>
+                <text y="205" x="316.4285714285714" class="value" style="fill: rgb(116, 196, 118); display: none;">1</text>
+                <text y="205" x="348.57142857142856" class="value" style="fill: rgb(116, 196, 118); display: none;">3</text>
+                <text y="205" x="380.71428571428567" class="value" style="fill: rgb(116, 196, 118); display: none;">1</text>
+                <text y="205" x="412.85714285714283" class="value" style="fill: rgb(116, 196, 118); display: none;">4</text>
+                <text y="205" x="445" class="value" style="fill: rgb(116, 196, 118); display: none;">2</text>
+                <text y="205" x="470" class="label" style="fill: rgb(116, 196, 118);">The European journal of...</text>
+            </g>
+            <g class="journal">
+                <circle cx="321.4285714285714" cy="220" r="4.545454545454545" style="fill: rgb(161, 217, 155); display: block;"></circle>
+                <circle cx="385.71428571428567" cy="220" r="4.545454545454545" style="fill: rgb(161, 217, 155); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="220" r="9" style="fill: rgb(161, 217, 155); display: block;"></circle>
+                <text y="225" x="316.4285714285714" class="value" style="fill: rgb(161, 217, 155); display: none;">4</text>
+                <text y="225" x="380.71428571428567" class="value" style="fill: rgb(161, 217, 155); display: none;">4</text>
+                <text y="225" x="412.85714285714283" class="value" style="fill: rgb(161, 217, 155); display: none;">11</text>
+                <text y="225" x="470" class="label" style="fill: rgb(161, 217, 155);">Conference proceedings : ......</text>
+            </g>
+            <g class="journal">
+                <circle cx="-128.57142857142856" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="-96.42857142857142" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="32.14285714285714" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="128.57142857142856" cy="240" r="5.5" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="192.85714285714283" cy="240" r="5.5" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="225" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="257.1428571428571" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="289.2857142857143" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="321.4285714285714" cy="240" r="5.5" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="353.57142857142856" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="385.71428571428567" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="240" r="3.75" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <circle cx="450" cy="240" r="9" style="fill: rgb(199, 233, 192); display: block;"></circle>
+                <text y="245" x="-133.57142857142856" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="-101.42857142857142" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="27.14285714285714" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="123.57142857142856" class="value" style="fill: rgb(199, 233, 192); display: none;">2</text>
+                <text y="245" x="187.85714285714283" class="value" style="fill: rgb(199, 233, 192); display: none;">2</text>
+                <text y="245" x="220" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="252.1428571428571" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="284.2857142857143" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="316.4285714285714" class="value" style="fill: rgb(199, 233, 192); display: none;">2</text>
+                <text y="245" x="348.57142857142856" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="380.71428571428567" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="412.85714285714283" class="value" style="fill: rgb(199, 233, 192); display: none;">1</text>
+                <text y="245" x="445" class="value" style="fill: rgb(199, 233, 192); display: none;">4</text>
+                <text y="245" x="470" class="label" style="fill: rgb(199, 233, 192);">The Journal of physiology</text>
+            </g>
+            <g class="journal">
+                <circle cx="128.57142857142856" cy="260" r="3.4000000000000004" style="fill: rgb(117, 107, 177);"></circle>
+                <circle cx="160.7142857142857" cy="260" r="3.4000000000000004" style="fill: rgb(117, 107, 177);"></circle>
+                <circle cx="289.2857142857143" cy="260" r="6.200000000000001" style="fill: rgb(117, 107, 177);"></circle>
+                <circle cx="321.4285714285714" cy="260" r="3.4000000000000004" style="fill: rgb(117, 107, 177);"></circle>
+                <circle cx="353.57142857142856" cy="260" r="4.800000000000001" style="fill: rgb(117, 107, 177);"></circle>
+                <circle cx="385.71428571428567" cy="260" r="6.200000000000001" style="fill: rgb(117, 107, 177);"></circle>
+                <circle cx="417.85714285714283" cy="260" r="9" style="fill: rgb(117, 107, 177);"></circle>
+                <circle cx="450" cy="260" r="6.200000000000001" style="fill: rgb(117, 107, 177);"></circle>
+                <text y="265" x="123.57142857142856" class="value" style="fill: rgb(117, 107, 177); display: none;">1</text>
+                <text y="265" x="155.7142857142857" class="value" style="fill: rgb(117, 107, 177); display: none;">1</text>
+                <text y="265" x="284.2857142857143" class="value" style="fill: rgb(117, 107, 177); display: none;">3</text>
+                <text y="265" x="316.4285714285714" class="value" style="fill: rgb(117, 107, 177); display: none;">1</text>
+                <text y="265" x="348.57142857142856" class="value" style="fill: rgb(117, 107, 177); display: none;">2</text>
+                <text y="265" x="380.71428571428567" class="value" style="fill: rgb(117, 107, 177); display: none;">3</text>
+                <text y="265" x="412.85714285714283" class="value" style="fill: rgb(117, 107, 177); display: none;">5</text>
+                <text y="265" x="445" class="value" style="fill: rgb(117, 107, 177); display: none;">3</text>
+                <text y="265" x="470" class="label" style="fill: rgb(117, 107, 177);">Neuropsychologia</text>
+            </g>
+            <g class="journal">
+                <circle cx="257.1428571428571" cy="280" r="3.75" style="fill: rgb(158, 154, 200);"></circle>
+                <circle cx="321.4285714285714" cy="280" r="3.75" style="fill: rgb(158, 154, 200);"></circle>
+                <circle cx="353.57142857142856" cy="280" r="2.875" style="fill: rgb(158, 154, 200);"></circle>
+                <circle cx="385.71428571428567" cy="280" r="9" style="fill: rgb(158, 154, 200);"></circle>
+                <circle cx="417.85714285714283" cy="280" r="4.625" style="fill: rgb(158, 154, 200);"></circle>
+                <circle cx="450" cy="280" r="3.75" style="fill: rgb(158, 154, 200);"></circle>
+                <text y="285" x="252.1428571428571" class="value" style="fill: rgb(158, 154, 200); display: none;">2</text>
+                <text y="285" x="316.4285714285714" class="value" style="fill: rgb(158, 154, 200); display: none;">2</text>
+                <text y="285" x="348.57142857142856" class="value" style="fill: rgb(158, 154, 200); display: none;">1</text>
+                <text y="285" x="380.71428571428567" class="value" style="fill: rgb(158, 154, 200); display: none;">8</text>
+                <text y="285" x="412.85714285714283" class="value" style="fill: rgb(158, 154, 200); display: none;">3</text>
+                <text y="285" x="445" class="value" style="fill: rgb(158, 154, 200); display: none;">2</text>
+                <text y="285" x="470" class="label" style="fill: rgb(158, 154, 200);">Restorative neurology and...</text>
+            </g>
+            <g class="journal">
+                <circle cx="160.7142857142857" cy="300" r="3.4000000000000004" style="fill: rgb(188, 189, 220);"></circle>
+                <circle cx="289.2857142857143" cy="300" r="9" style="fill: rgb(188, 189, 220);"></circle>
+                <circle cx="321.4285714285714" cy="300" r="3.4000000000000004" style="fill: rgb(188, 189, 220);"></circle>
+                <circle cx="353.57142857142856" cy="300" r="3.4000000000000004" style="fill: rgb(188, 189, 220);"></circle>
+                <circle cx="385.71428571428567" cy="300" r="4.800000000000001" style="fill: rgb(188, 189, 220);"></circle>
+                <circle cx="417.85714285714283" cy="300" r="7.6000000000000005" style="fill: rgb(188, 189, 220);"></circle>
+                <text y="305" x="155.7142857142857" class="value" style="fill: rgb(188, 189, 220); display: none;">1</text>
+                <text y="305" x="284.2857142857143" class="value" style="fill: rgb(188, 189, 220); display: none;">5</text>
+                <text y="305" x="316.4285714285714" class="value" style="fill: rgb(188, 189, 220); display: none;">1</text>
+                <text y="305" x="348.57142857142856" class="value" style="fill: rgb(188, 189, 220); display: none;">1</text>
+                <text y="305" x="380.71428571428567" class="value" style="fill: rgb(188, 189, 220); display: none;">2</text>
+                <text y="305" x="412.85714285714283" class="value" style="fill: rgb(188, 189, 220); display: none;">4</text>
+                <text y="305" x="470" class="label" style="fill: rgb(188, 189, 220);">Cerebral cortex (New York,...</text>
+            </g>
+            <g class="journal">
+                <circle cx="64.28571428571428" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="96.42857142857142" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="128.57142857142856" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="160.7142857142857" cy="320" r="9" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="192.85714285714283" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="225" cy="320" r="9" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="289.2857142857143" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="321.4285714285714" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="385.71428571428567" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <circle cx="450" cy="320" r="4.333333333333333" style="fill: rgb(218, 218, 235);"></circle>
+                <text y="325" x="59.28571428571428" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="91.42857142857142" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="123.57142857142856" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="155.7142857142857" class="value" style="fill: rgb(218, 218, 235); display: none;">3</text>
+                <text y="325" x="187.85714285714283" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="220" class="value" style="fill: rgb(218, 218, 235); display: none;">3</text>
+                <text y="325" x="284.2857142857143" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="316.4285714285714" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="380.71428571428567" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="445" class="value" style="fill: rgb(218, 218, 235); display: none;">1</text>
+                <text y="325" x="470" class="label" style="fill: rgb(218, 218, 235);">Neuroreport</text>
+            </g>
+            <g class="journal">
+                <circle cx="417.85714285714283" cy="340" r="3.1666666666666665" style="fill: rgb(99, 99, 99);"></circle>
+                <circle cx="450" cy="340" r="9" style="fill: rgb(99, 99, 99);"></circle>
+                <text y="345" x="412.85714285714283" class="value" style="fill: rgb(99, 99, 99); display: none;">2</text>
+                <text y="345" x="445" class="value" style="fill: rgb(99, 99, 99); display: none;">12</text>
+                <text y="345" x="470" class="label" style="fill: rgb(99, 99, 99);">Frontiers in human...</text>
+            </g>
+            <g class="journal">
+                <circle cx="128.57142857142856" cy="360" r="5.5" style="fill: rgb(150, 150, 150);"></circle>
+                <circle cx="160.7142857142857" cy="360" r="5.5" style="fill: rgb(150, 150, 150);"></circle>
+                <circle cx="289.2857142857143" cy="360" r="9" style="fill: rgb(150, 150, 150);"></circle>
+                <circle cx="321.4285714285714" cy="360" r="5.5" style="fill: rgb(150, 150, 150);"></circle>
+                <circle cx="353.57142857142856" cy="360" r="5.5" style="fill: rgb(150, 150, 150);"></circle>
+                <circle cx="385.71428571428567" cy="360" r="9" style="fill: rgb(150, 150, 150);"></circle>
+                <circle cx="417.85714285714283" cy="360" r="9" style="fill: rgb(150, 150, 150);"></circle>
+                <circle cx="450" cy="360" r="9" style="fill: rgb(150, 150, 150);"></circle>
+                <text y="365" x="123.57142857142856" class="value" style="fill: rgb(150, 150, 150); display: none;">1</text>
+                <text y="365" x="155.7142857142857" class="value" style="fill: rgb(150, 150, 150); display: none;">1</text>
+                <text y="365" x="284.2857142857143" class="value" style="fill: rgb(150, 150, 150); display: none;">2</text>
+                <text y="365" x="316.4285714285714" class="value" style="fill: rgb(150, 150, 150); display: none;">1</text>
+                <text y="365" x="348.57142857142856" class="value" style="fill: rgb(150, 150, 150); display: none;">1</text>
+                <text y="365" x="380.71428571428567" class="value" style="fill: rgb(150, 150, 150); display: none;">2</text>
+                <text y="365" x="412.85714285714283" class="value" style="fill: rgb(150, 150, 150); display: none;">2</text>
+                <text y="365" x="445" class="value" style="fill: rgb(150, 150, 150); display: none;">2</text>
+                <text y="365" x="470" class="label" style="fill: rgb(150, 150, 150);">Journal of cognitive...</text>
+            </g>
+            <g class="journal">
+                <circle cx="321.4285714285714" cy="380" r="3.4000000000000004" style="fill: rgb(189, 189, 189);"></circle>
+                <circle cx="417.85714285714283" cy="380" r="4.800000000000001" style="fill: rgb(189, 189, 189);"></circle>
+                <circle cx="450" cy="380" r="9" style="fill: rgb(189, 189, 189);"></circle>
+                <text y="385" x="316.4285714285714" class="value" style="fill: rgb(189, 189, 189); display: none;">1</text>
+                <text y="385" x="412.85714285714283" class="value" style="fill: rgb(189, 189, 189); display: none;">2</text>
+                <text y="385" x="445" class="value" style="fill: rgb(189, 189, 189); display: none;">5</text>
+                <text y="385" x="470" class="label" style="fill: rgb(189, 189, 189);">Neurorehabilitation and neural...</text>
+            </g>
+            <g class="journal">
+                <circle cx="289.2857142857143" cy="400" r="4.333333333333333" style="fill: rgb(217, 217, 217);"></circle>
+                <circle cx="321.4285714285714" cy="400" r="4.333333333333333" style="fill: rgb(217, 217, 217);"></circle>
+                <circle cx="353.57142857142856" cy="400" r="9" style="fill: rgb(217, 217, 217);"></circle>
+                <circle cx="385.71428571428567" cy="400" r="9" style="fill: rgb(217, 217, 217);"></circle>
+                <circle cx="417.85714285714283" cy="400" r="6.666666666666666" style="fill: rgb(217, 217, 217);"></circle>
+                <text y="405" x="284.2857142857143" class="value" style="fill: rgb(217, 217, 217); display: none;">1</text>
+                <text y="405" x="316.4285714285714" class="value" style="fill: rgb(217, 217, 217); display: none;">1</text>
+                <text y="405" x="348.57142857142856" class="value" style="fill: rgb(217, 217, 217); display: none;">3</text>
+                <text y="405" x="380.71428571428567" class="value" style="fill: rgb(217, 217, 217); display: none;">3</text>
+                <text y="405" x="412.85714285714283" class="value" style="fill: rgb(217, 217, 217); display: none;">2</text>
+                <text y="405" x="470" class="label" style="fill: rgb(217, 217, 217);">Current biology : CB</text>
+            </g>
+            <g class="journal">
+                <circle cx="321.4285714285714" cy="420" r="5.5" style="fill: rgb(49, 130, 189); display: block;"></circle>
+                <circle cx="385.71428571428567" cy="420" r="5.5" style="fill: rgb(49, 130, 189); display: block;"></circle>
+                <circle cx="450" cy="420" r="9" style="fill: rgb(49, 130, 189); display: block;"></circle>
+                <circle cx="257.1428571428571" cy="420" r="3.75" style="fill: rgb(49, 130, 189); display: block;"></circle>
+                <text y="425" x="316.4285714285714" class="value" style="fill: rgb(49, 130, 189); display: none;">2</text>
+                <text y="425" x="380.71428571428567" class="value" style="fill: rgb(49, 130, 189); display: none;">2</text>
+                <text y="425" x="445" class="value" style="fill: rgb(49, 130, 189); display: none;">4</text>
+                <text y="425" x="252.1428571428571" class="value" style="fill: rgb(49, 130, 189); display: none;">1</text>
+                <text y="425" x="470" class="label" style="fill: rgb(49, 130, 189);">Journal of affective disorders</text>
+            </g>
+            <g class="journal">
+                <circle cx="289.2857142857143" cy="440" r="3.75" style="fill: rgb(107, 174, 214); display: block;"></circle>
+                <circle cx="353.57142857142856" cy="440" r="3.75" style="fill: rgb(107, 174, 214); display: block;"></circle>
+                <circle cx="385.71428571428567" cy="440" r="5.5" style="fill: rgb(107, 174, 214); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="440" r="3.75" style="fill: rgb(107, 174, 214); display: block;"></circle>
+                <circle cx="450" cy="440" r="9" style="fill: rgb(107, 174, 214); display: block;"></circle>
+                <text y="445" x="284.2857142857143" class="value" style="fill: rgb(107, 174, 214); display: none;">1</text>
+                <text y="445" x="348.57142857142856" class="value" style="fill: rgb(107, 174, 214); display: none;">1</text>
+                <text y="445" x="380.71428571428567" class="value" style="fill: rgb(107, 174, 214); display: none;">2</text>
+                <text y="445" x="412.85714285714283" class="value" style="fill: rgb(107, 174, 214); display: none;">1</text>
+                <text y="445" x="445" class="value" style="fill: rgb(107, 174, 214); display: none;">4</text>
+                <text y="445" x="470" class="label" style="fill: rgb(107, 174, 214);">The international journal of...</text>
+            </g>
+            <g class="journal">
+                <circle cx="-321.4285714285714" cy="460" r="5.5" style="fill: rgb(158, 202, 225); display: block;"></circle>
+                <circle cx="96.42857142857142" cy="460" r="5.5" style="fill: rgb(158, 202, 225); display: block;"></circle>
+                <circle cx="192.85714285714283" cy="460" r="9" style="fill: rgb(158, 202, 225); display: block;"></circle>
+                <circle cx="321.4285714285714" cy="460" r="5.5" style="fill: rgb(158, 202, 225); display: block;"></circle>
+                <circle cx="353.57142857142856" cy="460" r="5.5" style="fill: rgb(158, 202, 225); display: block;"></circle>
+                <circle cx="417.85714285714283" cy="460" r="9" style="fill: rgb(158, 202, 225); display: block;"></circle>
+                <text y="465" x="-326.4285714285714" class="value" style="fill: rgb(158, 202, 225); display: none;">1</text>
+                <text y="465" x="91.42857142857142" class="value" style="fill: rgb(158, 202, 225); display: none;">1</text>
+                <text y="465" x="187.85714285714283" class="value" style="fill: rgb(158, 202, 225); display: none;">2</text>
+                <text y="465" x="316.4285714285714" class="value" style="fill: rgb(158, 202, 225); display: none;">1</text>
+                <text y="465" x="348.57142857142856" class="value" style="fill: rgb(158, 202, 225); display: none;">1</text>
+                <text y="465" x="412.85714285714283" class="value" style="fill: rgb(158, 202, 225); display: none;">2</text>
+                <text y="465" x="470" class="label" style="fill: rgb(158, 202, 225);">Brain : a journal of neurology</text>
+            </g>
+            <g class="journal">
+                <circle cx="192.85714285714283" cy="480" r="5.5" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="289.2857142857143" cy="480" r="5.5" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="353.57142857142856" cy="480" r="5.5" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="385.71428571428567" cy="480" r="9" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="417.85714285714283" cy="480" r="5.5" style="fill: rgb(198, 219, 239);"></circle>
+                <circle cx="450" cy="480" r="9" style="fill: rgb(198, 219, 239);"></circle>
+                <text y="485" x="187.85714285714283" class="value" style="fill: rgb(198, 219, 239); display: none;">1</text>
+                <text y="485" x="284.2857142857143" class="value" style="fill: rgb(198, 219, 239); display: none;">1</text>
+                <text y="485" x="348.57142857142856" class="value" style="fill: rgb(198, 219, 239); display: none;">1</text>
+                <text y="485" x="380.71428571428567" class="value" style="fill: rgb(198, 219, 239); display: none;">2</text>
+                <text y="485" x="412.85714285714283" class="value" style="fill: rgb(198, 219, 239); display: none;">1</text>
+                <text y="485" x="445" class="value" style="fill: rgb(198, 219, 239); display: none;">2</text>
+                <text y="485" x="470" class="label" style="fill: rgb(198, 219, 239);">BMC neuroscience</text>
+            </g>
+            <g class="journal">
+                <circle cx="353.57142857142856" cy="500" r="3.1666666666666665" style="fill: rgb(230, 85, 13);"></circle>
+                <circle cx="417.85714285714283" cy="500" r="9" style="fill: rgb(230, 85, 13);"></circle>
+                <circle cx="450" cy="500" r="3.1666666666666665" style="fill: rgb(230, 85, 13);"></circle>
+                <text y="505" x="348.57142857142856" class="value" style="fill: rgb(230, 85, 13); display: none;">1</text>
+                <text y="505" x="412.85714285714283" class="value" style="fill: rgb(230, 85, 13); display: none;">6</text>
+                <text y="505" x="445" class="value" style="fill: rgb(230, 85, 13); display: none;">1</text>
+                <text y="505" x="470" class="label" style="fill: rgb(230, 85, 13);">Neuromodulation : journal of...</text>
+            </g>
+            <g class="journal">
+                <circle cx="321.4285714285714" cy="520" r="3.75" style="fill: rgb(253, 141, 60);"></circle>
+                <circle cx="353.57142857142856" cy="520" r="3.75" style="fill: rgb(253, 141, 60);"></circle>
+                <circle cx="385.71428571428567" cy="520" r="5.5" style="fill: rgb(253, 141, 60);"></circle>
+                <circle cx="450" cy="520" r="9" style="fill: rgb(253, 141, 60);"></circle>
+                <text y="525" x="316.4285714285714" class="value" style="fill: rgb(253, 141, 60); display: none;">1</text>
+                <text y="525" x="348.57142857142856" class="value" style="fill: rgb(253, 141, 60); display: none;">1</text>
+                <text y="525" x="380.71428571428567" class="value" style="fill: rgb(253, 141, 60); display: none;">2</text>
+                <text y="525" x="445" class="value" style="fill: rgb(253, 141, 60); display: none;">4</text>
+                <text y="525" x="470" class="label" style="fill: rgb(253, 141, 60);">The journal of ECT</text>
+            </g>
+            <g class="journal">
+                <circle cx="353.57142857142856" cy="540" r="9" style="fill: rgb(253, 174, 107);"></circle>
+                <circle cx="385.71428571428567" cy="540" r="4.333333333333333" style="fill: rgb(253, 174, 107);"></circle>
+                <circle cx="417.85714285714283" cy="540" r="9" style="fill: rgb(253, 174, 107);"></circle>
+                <text y="545" x="348.57142857142856" class="value" style="fill: rgb(253, 174, 107); display: none;">3</text>
+                <text y="545" x="380.71428571428567" class="value" style="fill: rgb(253, 174, 107); display: none;">1</text>
+                <text y="545" x="412.85714285714283" class="value" style="fill: rgb(253, 174, 107); display: none;">3</text>
+                <text y="545" x="470" class="label" style="fill: rgb(253, 174, 107);">Brain research</text>
+            </g>
+            <g class="journal">
+                <circle cx="289.2857142857143" cy="560" r="3.75" style="fill: rgb(253, 208, 162);"></circle>
+                <circle cx="321.4285714285714" cy="560" r="3.75" style="fill: rgb(253, 208, 162);"></circle>
+                <circle cx="417.85714285714283" cy="560" r="3.75" style="fill: rgb(253, 208, 162);"></circle>
+                <circle cx="450" cy="560" r="9" style="fill: rgb(253, 208, 162);"></circle>
+                <text y="565" x="284.2857142857143" class="value" style="fill: rgb(253, 208, 162); display: none;">1</text>
+                <text y="565" x="316.4285714285714" class="value" style="fill: rgb(253, 208, 162); display: none;">1</text>
+                <text y="565" x="412.85714285714283" class="value" style="fill: rgb(253, 208, 162); display: none;">1</text>
+                <text y="565" x="445" class="value" style="fill: rgb(253, 208, 162); display: none;">4</text>
+                <text y="565" x="470" class="label" style="fill: rgb(253, 208, 162);">The Clinical journal of pain</text>
+            </g>
+            <g class="journal">
+                <circle cx="289.2857142857143" cy="580" r="3.4000000000000004" style="fill: rgb(49, 163, 84);"></circle>
+                <circle cx="417.85714285714283" cy="580" r="9" style="fill: rgb(49, 163, 84);"></circle>
+                <circle cx="257.1428571428571" cy="580" r="3.4000000000000004" style="fill: rgb(49, 163, 84);"></circle>
+                <text y="585" x="284.2857142857143" class="value" style="fill: rgb(49, 163, 84); display: none;">1</text>
+                <text y="585" x="412.85714285714283" class="value" style="fill: rgb(49, 163, 84); display: none;">5</text>
+                <text y="585" x="252.1428571428571" class="value" style="fill: rgb(49, 163, 84); display: none;">1</text>
+                <text y="585" x="470" class="label" style="fill: rgb(49, 163, 84);">Clinical EEG and neuroscience...</text>
+            </g>
+            <g class="journal">
+                <circle cx="353.57142857142856" cy="600" r="6.666666666666666" style="fill: rgb(116, 196, 118);"></circle>
+                <circle cx="385.71428571428567" cy="600" r="9" style="fill: rgb(116, 196, 118);"></circle>
+                <circle cx="450" cy="600" r="6.666666666666666" style="fill: rgb(116, 196, 118);"></circle>
+                <text y="605" x="348.57142857142856" class="value" style="fill: rgb(116, 196, 118); display: none;">2</text>
+                <text y="605" x="380.71428571428567" class="value" style="fill: rgb(116, 196, 118); display: none;">3</text>
+                <text y="605" x="445" class="value" style="fill: rgb(116, 196, 118); display: none;">2</text>
+                <text y="605" x="470" class="label" style="fill: rgb(116, 196, 118);">Behavioural brain research</text>
+            </g>
+        </g>
+    </svg>
+
+
+</body>
+
+</html>
