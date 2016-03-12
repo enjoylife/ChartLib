@@ -1,5 +1,6 @@
 import d3 from 'd3';
-import legend from 'd3-svg-legend/no-extend';
+// import legend from 'd3-svg-legend/no-extend';
+
 
 
 import {
@@ -9,6 +10,7 @@ import {
 
 import "./charts.less";
 
+import { createContainer } from "./helpers.js";
 
 // Main entry to charting lib
 $('.chart-lib').each(function()  {
@@ -37,9 +39,6 @@ $('.chart-lib').each(function()  {
 });
 
 
-
-
-
 /**
  * CODE WHICH RELIES ON THE DOM AND ELEMENTS
  */
@@ -53,20 +52,6 @@ function getAndParseChartData(url, cb) {
 
         if(cb) cb(rows);
     });
-}
-
-
-// creates the svg and sets the required attrs
-function createContainer(el) {
-    var dimensions = computeOptimalSize(el.parentElement);
-
-    var container = d3.select(el).append("svg")
-        .attr("width",dimensions.width + margin.left + margin.right)
-        .attr("height", dimensions.height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    return container;
 }
 
 function createAxes(chart, axes, config, height) {
@@ -85,6 +70,8 @@ function createAxes(chart, axes, config, height) {
       .style("text-anchor", "end")
       .text(config.yAxisLabel);
 }
+
+
 
 
 function createToolTip(el) {
@@ -172,24 +159,7 @@ return computeOptimalSize(el.parentElement);
 }
 
 
-/**
- * My idea of the perfectly sized chart is one where the
- *  aspect ratio is properly maintained to maximize clarity or the data.
- *  Not only that but the white space around the chart respects
- *  responsive design decisions.
- */
-function computeOptimalSize(el) {
-      var width = Math.max(Math.min(MAXWIDTH, el.clientWidth), MINWIDTH) ;
-      if(width > window.innerWidth) width  = window.innerWidth;
 
-      var height = Math.max(Math.min(MAXHEIGHT, el.clientHeight),MINHEIGHT);
-      if(height > window.innerHeight) height = window.innerHeight;
-
-      return {
-        width: width - margin.left - margin.right,
-        height: height -  margin.top - margin.bottom
-      };
-}
 
 
 
@@ -236,18 +206,29 @@ var transition = chart.transition().duration(750),
  */
 
 
-// Assumes we have just two dimensions within the row data
-function inferSimpleScales(dimensions, rows) {
+
+/**
+ *  Assumes we have just two dimensions within the row data
+ * 
+ * @param dimensions {Number} (description)
+ * @param rows {Array<Object>} (description)
+ * @returns (description)
+
+ */
+    function inferSimpleScales(dimensions, rows) {
   cbug(rows.columns.length == 2, "inferSimpleScales was not given data with two dimensions. It was given:" + rows.columns.join(","));
 
+  /** @param xProp {string} */
   let xProp = rows.columns[0]
   let yProp = rows.columns[1];
 
   var x = d3.scale.ordinal()
     .rangeRoundBands([0, dimensions.width], .1);
 
+    
   var y = d3.scale.linear()
     .range([dimensions.height, 0]).nice();
+    
 
   x.domain(rows.map( d => {return d[xProp]; } ));
   y.domain([0, d3.max(rows, (d) => { return +d[yProp];})]);
@@ -257,19 +238,19 @@ function inferSimpleScales(dimensions, rows) {
 
 
 function inferSimpleAxes(config, scales) {
-  var xAxis = d3.svg.axis()
-    .scale(scales.x)
-    .orient("bottom");
+    var xAxis = d3.svg.axis()
+        .scale(scales.x)
+        .orient("bottom");
 
-  var yAxis = customAxis()
-      .scale(scales.y)
-      .orient("left")
-      .outerTickSize(0)
-      .useMinimal(config.style == 'minimal')
-      .simpleFormat(config.yAxisFormat);
+    var yAxis = customAxis()
+        .scale(scales.y)
+        .orient("left")
+        .outerTickSize(0)
+        .useMinimal(config.style == 'minimal')
+        .simpleFormat(config.yAxisFormat);
 
 
-  return {x : xAxis, y:  yAxis}
+    return { x: xAxis, y: yAxis }
 }
 
 
