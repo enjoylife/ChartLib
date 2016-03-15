@@ -1,13 +1,13 @@
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
-    entry: "./src/index.js",
+    entry: "./src/index.jsx",
     output: {
         path: __dirname,
         filename: "bundle.js"
     },
-    // must be 'source-map' or 'inline-source-map'
-    devtool: 'source-map',
+    // must be 'source-map' or '-source-map'
+    devtool: 'inline-source-map',
     module: {
         loaders: [
             {
@@ -16,11 +16,11 @@ module.exports = {
                 // activate source maps via loader query
                 'css?sourceMap!less?sourceMap')
             }, {
-                test: /\.js?$/,
+                test: /\.jsx?$/,
                 exclude: /(node_modules|bower_components)/,
                 loader: 'babel',
                 query: {
-                    presets: ['es2015', 'react']
+                    presets: ['react', 'es2015']
                 }
             }
         ]
